@@ -1,53 +1,33 @@
-console.log("I'n running")
+import './style.css';
+import { TaskDomManager } from './taskDomManager.js';
+import {TaskManager} from './taskmanager.js'
 
-import { Task } from './task.js';
-import { TaskList } from './tasklist.js';
-import { TaskDomManager } from './domManage.js';
+document.addEventListener('DOMContentLoaded', () => {
+    const inputContainer = document.getElementById('taskInputContainer');
+    const taskListContainer = document.getElementById('taskListContainer');
 
-class TaskManager{
+    // Create input field for new tasks
+    const newTaskInput = document.createElement('input');
+    newTaskInput.id = 'newTaskDescription';
+    newTaskInput.placeholder = 'Enter a new task';
+ 
+    inputContainer.appendChild(newTaskInput);
 
-  constructor(){
-    this.taskList=new TaskList();
-  }
+    // Initialize TaskManager and TaskDomManager
+    const taskManager = new TaskManager();
+    const taskDomManager = new TaskDomManager(taskManager, taskListContainer);
 
-  addNewTask(description){
-    this.taskList.addTask(description);
-  }
+    const addTaskButton = document.createElement('button');
+    addTaskButton.textContent = 'Add Task';
+    addTaskButton.id = 'addTaskButton';
+    inputContainer.appendChild(addTaskButton);
+    document.getElementById('addTaskButton').addEventListener('click', () => {
+        const description = newTaskInput.value;
+        taskManager.addNewTask(description);
+        newTaskInput.value="";
+        taskDomManager.refreshTaskList();
+        
+    });
 
-  deleteTask(taskID){
-    this.taskList.removeTask(taskID);
-  }
-
-  toggleTaskStatus(taskId) {
-    this.taskList.toggleTaskCompletion(taskId);
-  }
-
-
-}
-
-
-class StickyWall{
-constructor(title,desc){
-    this.title=title;
-    this.desc=desc;
-}
-}
-
-
-const taskManager= new TaskManager();
-const taskDomManager= new TaskDomManager(taskManager, document.getElementById('task'));
-
-function addNewTask(description){
-    taskManager.addNewTask(description);
-    taskDomManager.refreshTaskList();
-}
-
-export function deleteTaskFromDOM(taskId){
-    taskManager.deleteTask(taskId);
-    taskDomManager.removeTaskFromDOM(taskId);
-}
-
-function toggleTaskStatus(taskId){
-    taskManager.toggleTaskStatus(taskId);
-    taskDomManager.refreshTaskList();
-}
+  
+});
