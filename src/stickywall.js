@@ -1,11 +1,11 @@
 export class Stickywall{
-   constructor(containerID){
-    this.stickyWall=document.getElementById(containerID);
-    this.draggedNote=null;
-    this.modal=this.createModal();
-    document.body.appendChild(this.modal.modalContainer);
-    this.createAddNoteButton();
-    this.createOverlay();
+   constructor(containerId){
+      this.stickyWall = document.getElementById(containerId);
+      this.draggedNote = null;
+      this.modal = this.createModal();
+      document.body.appendChild(this.modal.modalContainer);
+      this.createAddNoteButton();
+      this.overlay=this.createOverlay();
    }
 
    createAddNoteButton(){
@@ -16,45 +16,53 @@ export class Stickywall{
       this.stickyWall.appendChild(addNoteBtn);
    }
 
-   createModal(){
+   createModal() {
       const container = document.createElement('div');
       container.classList.add('modal');
-
-      const titleInput=document.createElement('input');
-      titleInput.type='text';
-      titleInput.placeholder='Title';
-
-      const textInput=document.createElement('textarea');
-      textInput.placeholder= "Write something...";
-
+  
+      const titleInput = document.createElement('input');
+      titleInput.type = 'text';
+      titleInput.placeholder = 'Title';
+  
+      const textInput = document.createElement('textarea');
+      textInput.placeholder = "Write something...";
+  
       const addButton = document.createElement('button');
       addButton.textContent = 'Add';
-      addButton.addEventListener('click', this.addNote);
-
+      addButton.addEventListener('click', this.addNote.bind(this)); // Bind this
+  
       container.appendChild(titleInput);
       container.appendChild(textInput);
       container.appendChild(addButton);
-
-      return{ modalContainer: container, titleInput, textInput };
-   }
+  
+      this.modal = { modalContainer: container, titleInput, textInput }; // Assign to this.modal
+      return this.modal;
+  }
 
    createOverlay(){
       const overlay= document.createElement('div');
       overlay.classList.add('overlay');
       document.body.appendChild(overlay);
       overlay.addEventListener('click', () => this.hideModal(this.modal.modalContainer, overlay));
+      return overlay;
    }
 
    addNote(){
-      const titleValue=modal.titleInput.value;
-      const textValue=modal.textInput.value;
 
-      if(titleValue && textValue){
-         const note=this.createNote(titleValue, textValue);
+      if (!this.modal || !this.modal.titleInput || !this.modal.textInput) {
+         console.error("Modal is not initialized properly.");
+         return;
+     }
+ 
+     const titleValue = this.modal.titleInput.value;
+     const textValue = this.modal.textInput.value;
+ 
+     if (titleValue && textValue) {
+         const note = this.createNote(titleValue, textValue);
          this.stickyWall.appendChild(note);
-         this.hideModal(this.modal.modalContainer, overlay);
-      }
-   }
+         this.hideModal(this.modal.modalContainer, this.overlay);
+     }
+ }
 
    createNote(title, text){
       
@@ -100,13 +108,13 @@ export class Stickywall{
 
    showModal(){
       this.modal.modalContainer.style.display='block';
-      overlay.style.display='block';
+      this.overlay.style.display='block';
 
    }
 
    hideModal(modal, overlay){
       modal.style.display='none';
-      overlay.style.display='none';
+      this.overlay.style.display='none';
    }
 }
 

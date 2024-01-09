@@ -4,9 +4,9 @@ export class TaskList{
        this.tasks=[];
      }
      
-     addTask(description){
+     addTask(description, priority, detail, dueDate){
        const id=this.tasks.length+1;
-       const newTask= new Task(id, description);
+       const newTask= new Task(id, description, priority, detail, dueDate);
        this.tasks.push(newTask);
      }
    

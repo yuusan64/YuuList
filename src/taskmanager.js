@@ -5,8 +5,8 @@ export class TaskManager{
       this.taskList=new TaskList();
     }
   
-    addNewTask(description){
-      this.taskList.addTask(description);
+    addNewTask(description, priority, detail, dueDate){
+      this.taskList.addTask(description, priority, detail, dueDate);
     }
   
     deleteTask(taskID){
@@ -17,5 +17,14 @@ export class TaskManager{
       this.taskList.toggleTaskCompletion(taskId);
     }
   
+    updateTask(taskId, newDescription, newPriority, newDetail, newDueDate) {
+      const task = this.taskList.getTask(taskId);
+      if (task) {
+          task.description = newDescription;
+          task.priority = newPriority;
+          task.detail = newDetail;
+          task.dueDate = newDueDate;
+      }
+  }
   
   }
