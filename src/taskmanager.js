@@ -1,4 +1,4 @@
- 
+import { isThisWeek } from "date-fns";
 export class Task{
   constructor(id,description, priority, detail, dueDate, isCompleted=false){
       this.id=id;
@@ -55,10 +55,7 @@ export class TaskManager{
       const savedTasks = localStorage.getItem('tasks');
       if (savedTasks) {
           const tasksArray = JSON.parse(savedTasks);
-          tasksArray.forEach(taskObj => {
-              const task = new Task(taskObj.id, taskObj.description, taskObj.isCompleted, taskObj.dueDate);
-              this.taskList.addTask(task);
-          });
+          this.taskList.tasks = tasksArray.map(taskObj => new Task(taskObj.id, taskObj.description, taskObj.priority, taskObj.detail, taskObj.dueDate, taskObj.isCompleted));
       }
     }
 
@@ -106,6 +103,10 @@ export class TaskManager{
       return this.taskList.tasks.filter(task => this.isDueToday(task));
     }
 
+    getTasksForWeek(){
+      return this.taskList.tasks.filter(task=>isThisWeek(new Date(task.dueDate)));
+
+    }
     saveTasks() {
       localStorage.setItem('tasks', JSON.stringify(this.taskList.tasks));
     }

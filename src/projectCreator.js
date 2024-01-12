@@ -38,13 +38,31 @@ function addNewProject(projectName, createProject) {
         return;
     }
     let newProject = document.createElement('li');
-    newProject.textContent = "- "+projectName;
+    newProject.textContent = projectName;
     let lists = document.getElementById('lists');
     // lists.appendChild(newProject);
     createProject.parentNode.insertBefore(newProject, createProject);
     
+    saveProjects();
+
+    let deleteButton=document.createElement('button');
+    deleteButton.textContent='X';
+    deleteButton.onclick=()=>{
+        newProject.remove();
+        saveProjects();
+    }
+    newProject.appendChild(deleteButton);
+
 }
 
+function saveProjects(){
+    let projects=[];
+    document.querySelectorAll('#lists li').forEach(li =>{
+        projects.push(li.textContent);
+    });
+    localStorage.setItem('projects', JSON.stringify(projects));
+
+}
 function revertCreateProject(createProjectButton, projectContainer) {
     if (projectContainer) {
         projectContainer.remove();

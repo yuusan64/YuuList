@@ -52,6 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
     taskListContainer.id = 'taskListContainer';
     taskDomManager = new TaskDomManager(taskManager, taskListContainer, showModal);
     
+    //load tasks from localStorage
+
+    taskManager.loadTasks(); 
+
     const navbar = setupNavbar();
     const sidebar = setupSidebar(mainContent,taskDomManager);
 
@@ -65,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadHomeContent(mainContent,taskDomManager); // Load home content by default
     setupCreateProject();
+    loadProjects();
 });
 
 function setupNavbar() {
@@ -77,7 +82,8 @@ function setupNavbar() {
 
     return navbar;
 }
-function setupSidebar(mainContent,taskDomManager) {
+
+function setupSidebar(mainContent, taskDomManager) {
     const sidebar = document.createElement('div');
     sidebar.id = 'sidebar';
 
@@ -88,17 +94,39 @@ function setupSidebar(mainContent,taskDomManager) {
         const listItem = document.createElement('li');
         listItem.textContent = item;
         listItem.id = item.toLowerCase();
+
+        if (item === 'Lists') {
+            // Create a sublist for 'Lists'
+            const sublist = document.createElement('ul');
+            const subItems = ['Work', 'Personal', 'Add Project'];
+
+            subItems.forEach(subItem => {
+                const subListItem = document.createElement('li');
+                subListItem.textContent = subItem;
+                sublist.appendChild(subListItem);
+
+                if (subItem === 'Add Project') {
+                    subListItem.id = 'create-project';
+                }
+            });
+
+            listItem.appendChild(sublist);
+        }
+
         listItem.addEventListener('click', () => {
             if (item !== 'Lists') {
                 loadContent(item, mainContent, taskDomManager);
             }
         });
+
         sidebarList.appendChild(listItem);
     });
 
     sidebar.appendChild(sidebarList);
     return sidebar;
 }
+
+
 
 function loadContent(contentName, mainContent, taskDomManager) {
    
@@ -108,11 +136,14 @@ function loadContent(contentName, mainContent, taskDomManager) {
             loadHomeContent(mainContent, taskDomManager);
             break;
         case 'today':
-            loadTodayContent(mainContent, taskDomManager);
+            loadTodayContent(mainContent);
             break;
-        case 'This Week':
+        case 'this week':
+            loadThisWeekContent(mainContent);
+            break;
 
-            break;
+        case 'lists':
+            loadListsContent(mainContent);    
     }
 }
 
@@ -150,7 +181,7 @@ if(!taskListContainer){
     
 }
 
-function loadTodayContent(mainContent, taskDomManager) {
+function loadTodayContent(mainContent) {
     mainContent.innerHTML="";
 
     const todayTaskListContainer=document.createElement('div');
@@ -168,6 +199,42 @@ function loadTodayContent(mainContent, taskDomManager) {
             todayTaskDomManager.addTaskToDOM(task);
         });
     }
+}
+
+function loadThisWeekContent(mainContent) {
+    console.log("Imcalled")
+    mainContent.innerHTML="";
+
+    const thisWeekContainer=document.createElement('div');
+    thisWeekContainer.id="thisWeekContainer";
+    mainContent.appendChild(thisWeekContainer);
+
+    const thisWeekTasks= taskManager.getTasksForWeek();
+
+    if(thisWeekTasks.length===0){
+        mainContent.innerHTML = "<p>No tasks due this week.</p>";
+    } else{
+
+        thisWeekTasks.forEach(task=>{
+            
+            const thisWeekDomManager=new TaskDomManager(taskManager, thisWeekContainer, showModal)
+            thisWeekDomManager.addTaskToDOM(task); 
+        })
+    }
+
+}
+
+function loadListsContent(mainContent){
+    let lists=document.getElementById('lists');
+    
+    if(!lists){
+        lists=document.createElement('div');
+        lists.id="lists";
+        mainContent.appendChild(lists);
+    }
+    
+  
+
 }
 
 
@@ -201,9 +268,6 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
     dueDateInput.id = 'modalDueDate';
     dueDateInput.type = 'date';
     dueDateInput.value = isEdit ? task.dueDate : '';
-    
-    
-    
     form.appendChild(dueDateInput);
 
     // Priority select
@@ -256,9 +320,23 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
 }
 
 
+function loadProjects(){
+    
+    const projects=JSON.parse(localStorage.getItem('projects')) || [];
+    const lists=document.getElementById('lists');
+
+    projects.forEach(projectName=>{
+        let projectItem=document.createElement('li');
+        projectItem.textContent=projectName;
+        lists.appendChild(projectItem);
+    })
 
 
 
+}
+
+/*
 
 
 
+*/
