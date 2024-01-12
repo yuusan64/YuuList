@@ -6,6 +6,7 @@ export class Stickywall{
       document.body.appendChild(this.modal.modalContainer);
       this.createAddNoteButton();
       this.overlay=this.createOverlay();
+      this.loadNotes();
    }
 
    createAddNoteButton(){
@@ -62,8 +63,27 @@ export class Stickywall{
          this.stickyWall.appendChild(note);
          this.hideModal(this.modal.modalContainer, this.overlay);
      }
+
+     this.saveNotes();
  }
 
+ saveNotes(){
+   let noteData=[];
+   this.stickyWall.querySelector('.note').forEach(note => {
+      const title= note.querySelector('h3').textContent;
+      const text=note.querySelector('p').textContent;
+      noteData.push({title, text});
+   });
+   localStorage.setItem('stickyNotes', JSON.stringify(noteData));
+ }
+ 
+ loadNotes(){
+   const notesData = JSON.parse(localStorage.getItem('stickyNotes')) || [];
+   notesData.forEach(noteData => {
+       const note = this.createNote(noteData.title, noteData.text);
+       this.stickyWall.appendChild(note);
+   });
+}
    createNote(title, text){
       
       const note = document.createElement('div');
@@ -103,7 +123,8 @@ export class Stickywall{
       this.stickyWall.insertBefore(note1,note2); //move note1 before note2
       this.stickyWall.insertBefore(note2, temp); //move note2 before temp element
       this.stickyWall.removeChild(temp); //remove temp element
-
+      
+      this.saveNotes();
    }
 
    showModal(){

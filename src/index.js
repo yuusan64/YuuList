@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const navbar = setupNavbar();
     const sidebar = setupSidebar(mainContent,taskDomManager);
+  
 
     const content = document.createElement('div');
     content.id = 'content';
@@ -104,7 +105,9 @@ function setupSidebar(mainContent, taskDomManager) {
                 const subListItem = document.createElement('li');
                 subListItem.textContent = subItem;
                 sublist.appendChild(subListItem);
-
+               
+    
+    
                 if (subItem === 'Add Project') {
                     subListItem.id = 'create-project';
                 }
@@ -143,7 +146,11 @@ function loadContent(contentName, mainContent, taskDomManager) {
             break;
 
         case 'lists':
-            loadListsContent(mainContent);    
+            loadListsContent(mainContent);   
+            
+        case 'stickywall':
+            loadStickyWallContent(mainContent);
+            break;    
     }
 }
 
@@ -284,6 +291,17 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
     });
     form.appendChild(priorityInput);
 
+    const projectDropdown=document.createElement('select');
+    projectDropdown.id='modalProject';
+    document.querySelectorAll('#lists li').forEach(li=>{
+        if(li.textContent!="Add Project"){
+        const option=document.createElement('option');
+        option.value =li.textContent;
+        option.textContent=li.textContent;
+        projectDropdown.appendChild(option);
+        }
+    });
+    form.appendChild(projectDropdown);
     // Add Task/Save Changes button
     const submitButton = document.createElement('button');
     submitButton.textContent = isEdit ? 'Save Changes' : 'Add Task';
@@ -319,12 +337,19 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
     }
 }
 
+function loadStickyWallContent(mainContent){
+    mainContent.innerHTML="";
+    const stickywall= new Stickywall('stickywall-container');
+    mainContent.appendChild(stickywall.container);
+}
 
 function loadProjects(){
     
+
     const projects=JSON.parse(localStorage.getItem('projects')) || [];
     const lists=document.getElementById('lists');
 
+   
     projects.forEach(projectName=>{
         let projectItem=document.createElement('li');
         projectItem.textContent=projectName;
@@ -334,9 +359,3 @@ function loadProjects(){
 
 
 }
-
-/*
-
-
-
-*/
