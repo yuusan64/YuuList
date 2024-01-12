@@ -10,6 +10,7 @@ export class TaskDomManager {
 
     //create DOM elements for task and append to root
     addTaskToDOM(task) { 
+
         const taskElement = document.createElement('div');
         taskElement.id = `task-${task.id}`;
         taskElement.className = 'task';

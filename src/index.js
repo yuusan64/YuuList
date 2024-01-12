@@ -2,89 +2,26 @@ import { Stickywall } from './stickywall.js';
 import './style.css';
 import { TaskDomManager } from './taskDomManager.js';
 import {TaskManager} from './taskmanager.js'
+import { setupCreateProject } from './projectCreator.js';
+import { isThisWeek } from "date-fns";
 
+let taskDomManager;
 const taskManager = new TaskManager();
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    const navbar = document.createElement('div');
-    navbar.id = 'navbar';
-    const title = document.createElement('h1');
-    title.textContent = 'Todo List';
-    navbar.appendChild(title);
-    document.body.appendChild(navbar);
-    //create sideBar
-
-    const sidebar=document.createElement('div');
-    sidebar.id='sidebar';
-    const sidebarList=document.createElement('ul');
-    const menuItems = ['Home', 'Projects', 'Lists', 'StickyWall'];
-
-    menuItems.forEach(item=>{
-        console.log("hi")
-        const listItem=document.createElement('li');
-        listItem.textContent=item;
-        listItem.id=item.toLowerCase();
-        listItem.addEventListener('click', ()=> loadContent(item));
-        sidebarList.appendChild(listItem);
-    });
-    
-     
-    sidebar.appendChild(sidebarList);
-
-    
-
    
-   
-
-    const mainContent=document.createElement('div');
-    mainContent.id='mainContent';
-   
-
-    const content=document.createElement('div');
-    content.id='content';
-    content.appendChild(sidebar);
-    content.appendChild(mainContent);
-    document.body.appendChild(content);
-
-function loadContent(contentName){
-    
-    mainContent.innerHTML="";
-    const content=document.createElement('div');
-    mainContent.appendChild(content);
-    if(contentName=="StickyWall"){
-        new Stickywall(mainContent.id);
+class ListController{
+    constructor(mainContent){
+        this.mainContent=mainContent;
     }
-    
-    else if(contentName=="Home"){
 
-    const inputContainer = document.createElement('div');
-    inputContainer.id = 'taskInputContainer';
-    const taskListContainer = document.createElement('div');
-    taskListContainer.id = 'taskListContainer';    
-
-    // Create input field for new tasks
-    const newTaskInput = document.createElement('input');
-    newTaskInput.id = 'newTaskDescription';
-    newTaskInput.placeholder = 'Enter a new task';
- 
-    inputContainer.appendChild(newTaskInput);
-
-    const taskDomManager = new TaskDomManager(taskManager, taskListContainer, showModal);
-
-    const addTaskButton = document.createElement('button');
-    addTaskButton.textContent = 'Add Task';
-    addTaskButton.id = 'addTaskButton';
-    mainContent.appendChild(addTaskButton);
-
-    addTaskButton.addEventListener('click', () => {
-        showModal(taskDomManager);
-    });
-    mainContent.appendChild(taskListContainer);
-  }
-
-  else if(contentName ==="Lists"){
+    render(){
     let lists=document.getElementById('lists');
+    
+    if(!lists){
+        lists=document.createElement('div');
+        lists.id="lists";
+        mainContent.appendChild(lists);
+    }
+
     let ul=document.createElement('ul');
     let work=document.createElement('li');
     work.id='work';
@@ -93,7 +30,7 @@ function loadContent(contentName){
     personal.textContent='- Personal';
     personal.id='personal';
     let createProject=document.createElement('li');
-    createProject.textContent=' + Create Project';
+    createProject.textContent=' + Add Project';
     createProject.id='create-project';
     
     ul.appendChild(work);
@@ -101,21 +38,144 @@ function loadContent(contentName){
     ul.appendChild(createProject);
     
     lists.appendChild(ul);
-
-    createProject.onclick=CreateProject();
-
-    
-  }
+}
 }
 
-loadContent('Home');
-loadContent('Lists');
+
+document.addEventListener('DOMContentLoaded', () => {
+    const mainContent = document.createElement('div');
+    mainContent.id = 'mainContent';
+
+    
+    
+    const taskListContainer = document.createElement('div');
+    taskListContainer.id = 'taskListContainer';
+    taskDomManager = new TaskDomManager(taskManager, taskListContainer, showModal);
+    
+    const navbar = setupNavbar();
+    const sidebar = setupSidebar(mainContent,taskDomManager);
+
+    const content = document.createElement('div');
+    content.id = 'content';
+    content.appendChild(sidebar);
+    content.appendChild(mainContent);
+
+    document.body.appendChild(navbar);
+    document.body.appendChild(content);
+
+    loadHomeContent(mainContent,taskDomManager); // Load home content by default
+    setupCreateProject();
+});
+
+function setupNavbar() {
+    const navbar = document.createElement('div');
+    navbar.id = 'navbar';
+    
+    const title = document.createElement('h1');
+    title.textContent = 'Todo List';
+    navbar.appendChild(title);
+
+    return navbar;
+}
+function setupSidebar(mainContent,taskDomManager) {
+    const sidebar = document.createElement('div');
+    sidebar.id = 'sidebar';
+
+    const sidebarList = document.createElement('ul');
+    const menuItems = ['Home', 'Today', 'This Week', 'Lists', 'StickyWall'];
+
+    menuItems.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.textContent = item;
+        listItem.id = item.toLowerCase();
+        listItem.addEventListener('click', () => {
+            if (item !== 'Lists') {
+                loadContent(item, mainContent, taskDomManager);
+            }
+        });
+        sidebarList.appendChild(listItem);
+    });
+
+    sidebar.appendChild(sidebarList);
+    return sidebar;
+}
+
+function loadContent(contentName, mainContent, taskDomManager) {
+   
+
+    switch(contentName.toLowerCase()) {
+        case 'home':
+            loadHomeContent(mainContent, taskDomManager);
+            break;
+        case 'today':
+            loadTodayContent(mainContent, taskDomManager);
+            break;
+        case 'This Week':
+
+            break;
+    }
+}
+
+function loadHomeContent(mainContent, taskDomManager) {
+
+let taskListContainer = document.getElementById('taskListcontainer');
+mainContent.innerHTML="";
+if(!taskListContainer){
+       
+        const taskListContainer = document.createElement('div');
+        taskListContainer.id = 'taskListContainer';    
+    
+        const inputContainer = document.createElement('div');
+        inputContainer.id = 'taskInputContainer';
+    
+        const addTaskButton = document.createElement('button');
+        addTaskButton.textContent = 'Add Task';
+        addTaskButton.id = 'addTaskButton';
+        inputContainer.appendChild(addTaskButton);
+
+        addTaskButton.addEventListener('click', () => {
+            showModal(taskDomManager);
+        });
+       
+        inputContainer.appendChild(addTaskButton);
+
+        mainContent.appendChild(inputContainer);
+        mainContent.appendChild(taskListContainer);
+
+       
+}
+    //always refresh task list when rendered
+    mainContent.appendChild(taskDomManager.rootElement);
+    taskDomManager.refreshTaskList();   
+    
+}
+
+function loadTodayContent(mainContent, taskDomManager) {
+    mainContent.innerHTML="";
+
+    const todayTaskListContainer=document.createElement('div');
+    todayTaskListContainer.id='todayTaskListContainer';
+    mainContent.appendChild(todayTaskListContainer);
+
+    const todayTasks = taskManager.getTasksForToday();
+    console.log(todayTasks);
+    if (todayTasks.length === 0) {
+        mainContent.innerHTML = "<p>No tasks due today.</p>";
+    } else {
+        
+        todayTasks.forEach(task => {
+            const todayTaskDomManager= new TaskDomManager(taskManager, todayTaskListContainer, showModal)
+            todayTaskDomManager.addTaskToDOM(task);
+        });
+    }
+}
+
 
 function showModal(taskDomManager,isEdit = false, task = {}) {
 
     const modal = document.createElement('div');
     modal.id = 'taskModal';
-    modal.className = 'modal';
+    modal.className = 'task-modal';
 
     // Create and add a form to the modal
     const form = document.createElement('form');
@@ -141,6 +201,9 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
     dueDateInput.id = 'modalDueDate';
     dueDateInput.type = 'date';
     dueDateInput.value = isEdit ? task.dueDate : '';
+    
+    
+    
     form.appendChild(dueDateInput);
 
     // Priority select
@@ -190,8 +253,9 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
         // Close the modal
         document.body.removeChild(modal);
     }
-};
-});
+}
+
+
 
 
 

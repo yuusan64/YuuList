@@ -18,7 +18,7 @@ export class Stickywall{
 
    createModal() {
       const container = document.createElement('div');
-      container.classList.add('modal');
+      container.classList.add('sticky-modal');
   
       const titleInput = document.createElement('input');
       titleInput.type = 'text';

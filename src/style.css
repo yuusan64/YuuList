@@ -52,15 +52,37 @@ body {
     padding: 0;
 }
 
-#sidebar ul li {
+#sidebar > ul > li {
     padding: 10px;
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.3s;
 }
 
-#sidebar ul li:hover {
+
+#sidebar > ul > li:hover, #sidebar ul ul li:hover {
     background-color: #e0e0e0;
+} 
+
+#sidebar ul li {
+    cursor: pointer;
+    padding: 10px 20px;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#sidebar ul li:hover {
+    background-color: #f0f0f0;
+    color: #000;
+}
+
+#sidebar ul li.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#lists{
+    padding: 10px;
 }
 
 #mainContent {
@@ -137,7 +159,7 @@ body {
 }
 
 /* Modal styles */
-.modal {
+.task-modal {
     position: fixed;
     left: 50%;
     top: 50%;
@@ -149,9 +171,9 @@ body {
     z-index: 1000; /* Ensure it's above other content */
 }
 
-.modal input, 
-.modal textarea, 
-.modal select {
+.task-modal input, 
+.task-modal textarea, 
+.task-modal select {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
@@ -159,7 +181,7 @@ body {
     border-radius: 4px;
 }
 
-.modal button {
+.task-modal button {
     padding: 10px 15px;
     background-color: #5cb85c;
     color: white;
@@ -168,7 +190,7 @@ body {
     cursor: pointer;
 }
 
-.modal button:hover {
+.task-modal button:hover {
     background-color: #4cae4c;
 }
 
@@ -206,8 +228,9 @@ body {
   }
   
   /* Modal styles */
-  .modal {
-
+ 
+ .sticky-modal {
+    display: none;
     position: fixed;
     left: 50%;
     top: 50%;
@@ -216,8 +239,26 @@ body {
     padding: 20px;
     border: 1px solid #ccc;
     z-index: 1000;
-  }
-  
+}
+
+.sticky-modal input, .sticky-modal textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Modal button */
+.sticky-modal button {
+    padding: 10px 15px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
   /* Overlay */
   .overlay {
     display: none;
@@ -229,28 +270,75 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
   }
+ 
   
-  /* Modal input styles */
-  .modal input, .modal textarea {
+  .task-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+/* Background overlay */
+#task-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 999; /* Just below the modal */
+}
   
-  /* Modal button */
-  .modal button {
-    padding: 10px 15px;
-    background-color: #5cb85c;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
   
   #buttons{
 
     display: flex;
     justify-content: space-between;
   }
+
+  #project-container {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+}
+
+#project-container input[type="text"] {
+    width: 70%;
+    padding: 8px 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#project-container button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#project-container button:nth-child(2) {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#project-container button:nth-child(2):hover {
+    background-color: #45a049;
+}
+
+#project-container button:nth-child(3) {
+    background-color: #f44336;
+    color: white;
+}
+
+#project-container button:nth-child(3):hover {
+    background-color: #d32f2f;
+}
