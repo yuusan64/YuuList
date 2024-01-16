@@ -39,7 +39,6 @@ export class TaskDomManager {
     
         this.rootElement.appendChild(taskElement);
 
-
     }
     
 

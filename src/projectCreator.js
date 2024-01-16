@@ -1,5 +1,9 @@
+import { TaskDomManager } from "./taskDomManager";
+
+import { loadTasksForProject } from "./index";
+
 export function setupCreateProject() {
-    const createProject = document.getElementById('create-project');
+    const createProject = document.getElementById('add-project');
     if (!createProject) {
         return;
     }
@@ -27,7 +31,7 @@ export function setupCreateProject() {
         cancelButton.addEventListener('click', () => revertCreateProject(createProject, projectContainer));
         projectContainer.appendChild(cancelButton);
 
-        createProject.parentNode.insertBefore(projectContainer, createProject);
+        createProject.parentNode.insertBefore(projectContainer,createProject);
         createProject.style.display = 'none';
     });
 }
@@ -38,20 +42,40 @@ function addNewProject(projectName, createProject) {
         return;
     }
     let newProject = document.createElement('li');
-    newProject.textContent = projectName;
-    let lists = document.getElementById('lists');
-    // lists.appendChild(newProject);
-    createProject.parentNode.insertBefore(newProject, createProject);
+    const proectNameSpan=document.createElement('span');
+    proectNameSpan.textContent=projectName;
+    proectNameSpan.classList.add('projectName');
+    newProject.appendChild(proectNameSpan);
+   console.log(proectNameSpan);
+   
+
     
+    
+    
+    newProject.id = projectName.toLowerCase().replace(' ', '-');
+    createProject.parentNode.insertBefore(newProject, createProject);
+    newProject.addEventListener('click', ()=>{
+        loadTasksForProject(projectName, mainContent)
+    })
     saveProjects();
+    // lists.appendChild(newProject);
+
 
     let deleteButton=document.createElement('button');
-    deleteButton.textContent='X';
+    deleteButton.textContent=' X ';
+    deleteButton.classList.add("delete-project");
     deleteButton.onclick=()=>{
         newProject.remove();
         saveProjects();
     }
     newProject.appendChild(deleteButton);
+   
+    let lists = document.getElementById('lists');
+    console.log(newProject);
+    console.log(createProject);
+   
+    saveProjects();
+
 
 }
 
@@ -69,3 +93,4 @@ function revertCreateProject(createProjectButton, projectContainer) {
     }
     createProjectButton.style.display = 'block';
 }
+

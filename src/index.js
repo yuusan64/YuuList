@@ -2,55 +2,20 @@ import { Stickywall } from './stickywall.js';
 import './style.css';
 import { TaskDomManager } from './taskDomManager.js';
 import {TaskManager} from './taskmanager.js'
-import { setupCreateProject } from './projectCreator.js';
+import { setupCreateProject, saveProjects} from './projectCreator.js';
 import { isThisWeek } from "date-fns";
 
 let taskDomManager;
 const taskManager = new TaskManager();
-   
-class ListController{
-    constructor(mainContent){
-        this.mainContent=mainContent;
-    }
-
-    render(){
-    let lists=document.getElementById('lists');
-    
-    if(!lists){
-        lists=document.createElement('div');
-        lists.id="lists";
-        mainContent.appendChild(lists);
-    }
-
-    let ul=document.createElement('ul');
-    let work=document.createElement('li');
-    work.id='work';
-    work.textContent='- Work';
-    let personal=document.createElement('li');
-    personal.textContent='- Personal';
-    personal.id='personal';
-    let createProject=document.createElement('li');
-    createProject.textContent=' + Add Project';
-    createProject.id='create-project';
-    
-    ul.appendChild(work);
-    ul.appendChild(personal);
-    ul.appendChild(createProject);
-    
-    lists.appendChild(ul);
-}
-}
-
 
 document.addEventListener('DOMContentLoaded', () => {
+    
     const mainContent = document.createElement('div');
     mainContent.id = 'mainContent';
 
-    
-    
     const taskListContainer = document.createElement('div');
     taskListContainer.id = 'taskListContainer';
-    taskDomManager = new TaskDomManager(taskManager, taskListContainer, showModal);
+    taskDomManager = new TaskDomManager(taskManager, taskListContainer, createModal);
     
     //load tasks from localStorage
 
@@ -70,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadHomeContent(mainContent,taskDomManager); // Load home content by default
     setupCreateProject();
-    loadProjects();
+    // loadProjects();
 });
 
 function setupNavbar() {
@@ -88,51 +53,66 @@ function setupSidebar(mainContent, taskDomManager) {
     const sidebar = document.createElement('div');
     sidebar.id = 'sidebar';
 
-    const sidebarList = document.createElement('ul');
-    const menuItems = ['Home', 'Today', 'This Week', 'Lists', 'StickyWall'];
+    const sidebarList = document.createElement('ul');                                              
+    const menuItems = ['Home', 'Today', 'This Week', 'Lists', 'StickyWall'];                       
 
     menuItems.forEach(item => {
-        const listItem = document.createElement('li');
-        listItem.textContent = item;
-        listItem.id = item.toLowerCase();
-
+        
+        
         if (item === 'Lists') {
-            // Create a sublist for 'Lists'
-            const sublist = document.createElement('ul');
-            const subItems = ['Work', 'Personal', 'Add Project'];
+            const listItem = document.createElement('ul');
+            listItem.id = item.toLowerCase();
+            const listTitle=document.createElement('div');
+            listTitle.id=item.toLowerCase()+"-items";
+            listTitle.textContent=item;
+            listItem.appendChild(listTitle);
 
+            
+            const sublist = document.createElement('ul');
+            sublist.id="sublist";
+           
+            const subItems = ['Work', 'Personal', 'Add Project'];
             subItems.forEach(subItem => {
                 const subListItem = document.createElement('li');
                 subListItem.textContent = subItem;
+                subListItem.id = subItem.toLowerCase().replace(' ', '-');
+
                 sublist.appendChild(subListItem);
-               
-    
-    
-                if (subItem === 'Add Project') {
-                    subListItem.id = 'create-project';
+                listItem.appendChild(sublist);
+                if(subItem!=='Add Project'){
+                    subListItem.classList.add('projectName');
+                    subListItem.addEventListener('click', ()=>{
+                        loadTasksForProject(subItem, mainContent);
+                    })
                 }
+
+           
+                
             });
+            sidebarList.appendChild(listItem);
 
-            listItem.appendChild(sublist);
-        }
-
-        listItem.addEventListener('click', () => {
-            if (item !== 'Lists') {
+            
+        } else {
+            const listItem = document.createElement('li');
+            listItem.textContent = item;
+            listItem.id = item.toLowerCase();
+            listItem.addEventListener('click', () => {
                 loadContent(item, mainContent, taskDomManager);
-            }
-        });
-
+            });
+           
         sidebarList.appendChild(listItem);
+            
+        }
+        
     });
-
     sidebar.appendChild(sidebarList);
+  
     return sidebar;
 }
 
-
-
 function loadContent(contentName, mainContent, taskDomManager) {
    
+    console.log(contentName);
 
     switch(contentName.toLowerCase()) {
         case 'home':
@@ -143,18 +123,17 @@ function loadContent(contentName, mainContent, taskDomManager) {
             break;
         case 'this week':
             loadThisWeekContent(mainContent);
-            break;
-
-        case 'lists':
-            loadListsContent(mainContent);   
+            break;  
             
         case 'stickywall':
             loadStickyWallContent(mainContent);
             break;    
-    }
+        
+}
 }
 
 function loadHomeContent(mainContent, taskDomManager) {
+   
 
 let taskListContainer = document.getElementById('taskListcontainer');
 mainContent.innerHTML="";
@@ -170,9 +149,12 @@ if(!taskListContainer){
         addTaskButton.textContent = 'Add Task';
         addTaskButton.id = 'addTaskButton';
         inputContainer.appendChild(addTaskButton);
-
+        
+        const modal = document.createElement('div');
+        modal.id = 'taskModal';
+        modal.className = 'task-modal';
         addTaskButton.addEventListener('click', () => {
-            showModal(taskDomManager);
+            createModal(taskDomManager);
         });
        
         inputContainer.appendChild(addTaskButton);
@@ -202,7 +184,7 @@ function loadTodayContent(mainContent) {
     } else {
         
         todayTasks.forEach(task => {
-            const todayTaskDomManager= new TaskDomManager(taskManager, todayTaskListContainer, showModal)
+            const todayTaskDomManager= new TaskDomManager(taskManager, todayTaskListContainer, createModal)
             todayTaskDomManager.addTaskToDOM(task);
         });
     }
@@ -224,36 +206,61 @@ function loadThisWeekContent(mainContent) {
 
         thisWeekTasks.forEach(task=>{
             
-            const thisWeekDomManager=new TaskDomManager(taskManager, thisWeekContainer, showModal)
+            const thisWeekDomManager=new TaskDomManager(taskManager, thisWeekContainer, createModal)
             thisWeekDomManager.addTaskToDOM(task); 
         })
     }
 
 }
 
-function loadListsContent(mainContent){
-    let lists=document.getElementById('lists');
-    
-    if(!lists){
-        lists=document.createElement('div');
-        lists.id="lists";
-        mainContent.appendChild(lists);
-    }
-    
-  
+export function loadTasksForProject(projectName, mainContent) {
+    const tasks = taskManager.getTasksByProject(projectName);
+    console.log(`Loading tasks for project: ${projectName}`, tasks);
 
+    mainContent.innerHTML = ''; 
+    const projectTasksContainer = document.createElement('div');
+    projectTasksContainer.id = `tasks-for-${projectName.toLowerCase()}`;
+    mainContent.appendChild(projectTasksContainer);
+
+    if (tasks.length === 0) {
+        mainContent.innerHTML = `<p>No tasks for ${projectName}.</p>`;
+    } else {
+        tasks.forEach(task => {
+            const projectDom=new TaskDomManager(taskManager, projectTasksContainer, createModal);
+            projectDom.addTaskToDOM(task);
+        });
+
+    }
 }
 
 
-function showModal(taskDomManager,isEdit = false, task = {}) {
+function showModal(){
 
-    const modal = document.createElement('div');
-    modal.id = 'taskModal';
-    modal.className = 'task-modal';
+    const overlay=document.getElementById('overlay');
+    let modal=document.getElementById('taskModal');
+    overlay.style.display='block';
+    modal.style.display='block';
+}
 
+function createModal(taskDomManager,isEdit = false, task = {}) {
+
+
+    let modal=document.getElementById('taskModal');
+    let overlay=document.getElementById('overlay');
+
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'taskModal';
+        modal.className = 'task-modal';
+        document.body.appendChild(modal);
+
+        overlay = createOverlay();
+    }
+    modal.innerHTML="";
     // Create and add a form to the modal
     const form = document.createElement('form');
     modal.appendChild(form);
+   
 
     // Description input
     const descriptionInput = document.createElement('input');
@@ -293,11 +300,15 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
 
     const projectDropdown=document.createElement('select');
     projectDropdown.id='modalProject';
-    document.querySelectorAll('#lists li').forEach(li=>{
-        if(li.textContent!="Add Project"){
+    document.querySelectorAll('.projectName').forEach(li=>{
+        if(li.textContent!=="Add Project"){
         const option=document.createElement('option');
         option.value =li.textContent;
         option.textContent=li.textContent;
+
+        if(isEdit && task.project===li.textContent){
+            option.selected=true;
+        }
         projectDropdown.appendChild(option);
         }
     });
@@ -310,7 +321,7 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
 
     // Append the modal to the body
     document.body.appendChild(modal);
-
+      
     // Form submission event
     form.onsubmit = (e) => {
         e.preventDefault(); // Prevent the form from submitting normally
@@ -320,42 +331,52 @@ function showModal(taskDomManager,isEdit = false, task = {}) {
         const detail = detailInput.value.trim();
         const dueDate = dueDateInput.value;
         const priority = priorityInput.value;
+        const project = document.getElementById('modalProject').value;
+        console.log(project);
     
         if (isEdit) {
             // Update existing task
-            taskManager.updateTask(task.id, description, priority, detail, dueDate);
+            taskManager.updateTask(task.id, description, priority, detail, dueDate, project);
         } else {
             // Add new task
-            taskManager.addNewTask(description, priority, detail, dueDate);
+            taskManager.addNewTask(description, priority, detail, dueDate, project);
         }
     
         // Refresh the task list to reflect the changes
         taskDomManager.refreshTaskList();
     
         // Close the modal
-        document.body.removeChild(modal);
+        hideModal(overlay);
+    };
+
+    showModal();
+}
+
+function createOverlay(){
+    
+    let overlay= document.getElementById('div');
+    if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='overlay';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', () => hideModal(overlay));
     }
+    return overlay;
+ }
+function hideModal(overlay){
+    let modal=document.getElementById('taskModal');
+    
+        modal.style.display='none';
+    
+    
+    overlay.style.display='none';
 }
 
 function loadStickyWallContent(mainContent){
+    // Clear the existing content
     mainContent.innerHTML="";
-    const stickywall= new Stickywall('stickywall-container');
-    mainContent.appendChild(stickywall.container);
+
+    new Stickywall(mainContent, 'stickywall-container');
 }
 
-function loadProjects(){
-    
 
-    const projects=JSON.parse(localStorage.getItem('projects')) || [];
-    const lists=document.getElementById('lists');
-
-   
-    projects.forEach(projectName=>{
-        let projectItem=document.createElement('li');
-        projectItem.textContent=projectName;
-        lists.appendChild(projectItem);
-    })
-
-
-
-}

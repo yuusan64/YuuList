@@ -1,20 +1,26 @@
 export class Stickywall{
-   constructor(containerId){
-      this.stickyWall = document.getElementById(containerId);
-      this.draggedNote = null;
+   constructor(mainContent, containerId){
       this.modal = this.createModal();
-      document.body.appendChild(this.modal.modalContainer);
-      this.createAddNoteButton();
       this.overlay=this.createOverlay();
+      this.stickyWall = document.createElement('div');
+      this.stickyWall.id=containerId;
+      this.draggedNote = null;
+     
+      this.createAddNoteButton(mainContent);
+      mainContent.appendChild(this.stickyWall);
+      document.body.appendChild(this.modal.modalContainer);
+      document.body.appendChild(this.overlay);
       this.loadNotes();
+      
+      
    }
 
-   createAddNoteButton(){
+   createAddNoteButton(mainContent){
       const addNoteBtn=document.createElement('div');
       addNoteBtn.classList.add('add-note');
       addNoteBtn.textContent='+';
       addNoteBtn.addEventListener('click', () =>this.showModal());
-      this.stickyWall.appendChild(addNoteBtn);
+      mainContent.appendChild(addNoteBtn);
    }
 
    createModal() {
@@ -60,6 +66,7 @@ export class Stickywall{
  
      if (titleValue && textValue) {
          const note = this.createNote(titleValue, textValue);
+         
          this.stickyWall.appendChild(note);
          this.hideModal(this.modal.modalContainer, this.overlay);
      }
@@ -69,7 +76,7 @@ export class Stickywall{
 
  saveNotes(){
    let noteData=[];
-   this.stickyWall.querySelector('.note').forEach(note => {
+   this.stickyWall.querySelectorAll('.note').forEach(note => {
       const title= note.querySelector('h3').textContent;
       const text=note.querySelector('p').textContent;
       noteData.push({title, text});
@@ -105,13 +112,23 @@ export class Stickywall{
             this.swapNotes(this.draggedNote, note);
          }
       });
-       
+      
       const titleElement=document.createElement('h3');
       titleElement.textContent=title;
       const textElement = document.createElement('p');
       textElement.textContent=text;
+
+      const removeButton=document.createElement('button');
+      removeButton.textContent='X';
+      removeButton.classList.add('remove-note');
+      removeButton.addEventListener('click', ()=>{
+         note.remove();
+         this.saveNotes();
+      })
+
       note.appendChild(titleElement);
       note.appendChild(textElement);
+      note.appendChild(removeButton); 
 
       return note;
    }
@@ -128,6 +145,9 @@ export class Stickywall{
    }
 
    showModal(){
+      this.modal.titleInput.value='';
+      this.modal.textInput.value='';
+
       this.modal.modalContainer.style.display='block';
       this.overlay.style.display='block';
 
@@ -135,10 +155,7 @@ export class Stickywall{
 
    hideModal(modal, overlay){
       modal.style.display='none';
-      this.overlay.style.display='none';
+      overlay.style.display='none';
    }
 }
 
-class lists{
-
-}

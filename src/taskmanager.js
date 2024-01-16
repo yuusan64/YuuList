@@ -1,11 +1,12 @@
 import { isThisWeek } from "date-fns";
 export class Task{
-  constructor(id,description, priority, detail, dueDate, isCompleted=false){
+  constructor(id,description, priority, detail, dueDate, project, isCompleted=false){
       this.id=id;
       this.description=description;
       this.detail=detail;
       this.priority=priority;
       this.dueDate=dueDate;
+      this.project=project;
       this.isCompleted=isCompleted;
   }
 
@@ -22,9 +23,9 @@ export class TaskList{
      this.thisWeek=[];
    }
    
-   addTask(description, priority, detail, dueDate){
+   addTask(description, priority, detail, dueDate, project){
      const id=this.tasks.length+1;
-     const newTask= new Task(id, description, priority, detail, dueDate);
+     const newTask= new Task(id, description, priority, detail, dueDate, project);
      console.log(dueDate);
      let today = new Date().toISOString().slice(0, 10)
      this.tasks.push(newTask);
@@ -59,8 +60,8 @@ export class TaskManager{
       }
     }
 
-    addNewTask(description, priority, detail, dueDate){
-      this.taskList.addTask(description, priority, detail, dueDate);
+    addNewTask(description, priority, detail, dueDate, project){
+      this.taskList.addTask(description, priority, detail, dueDate, project);
       this.saveTasks(); // Save after adding a new task
     }
   
@@ -74,13 +75,15 @@ export class TaskManager{
       this.saveTasks();// Save task status
     }
   
-    updateTask(taskId, newDescription, newPriority, newDetail, newDueDate) {
+    updateTask(taskId, newDescription, newPriority, newDetail, newDueDate, project) {
       const task = this.taskList.getTask(taskId);
       if (task) {
           task.description = newDescription;
           task.priority = newPriority;
           task.detail = newDetail;
           task.dueDate = newDueDate;
+          task.project = project;
+          console.log(project);
       }
       this.saveTasks(); // Save after updating a task
     }
@@ -107,6 +110,11 @@ export class TaskManager{
       return this.taskList.tasks.filter(task=>isThisWeek(new Date(task.dueDate)));
 
     }
+
+    getTasksByProject(projectName) {
+      return this.taskList.tasks.filter(task => task.project === projectName);
+  }
+
     saveTasks() {
       localStorage.setItem('tasks', JSON.stringify(this.taskList.tasks));
     }
