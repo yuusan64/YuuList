@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     //load tasks from localStorage
 
-    taskManager.loadTasks(); 
 
     const navbar = setupNavbar();
     const sidebar = setupSidebar(mainContent,taskDomManager);
@@ -35,7 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadHomeContent(mainContent,taskDomManager); // Load home content by default
     setupCreateProject();
-    // loadProjects();
+    taskManager.loadTasks();  // Load tasks from localStorage
+    loadProjects(mainContent); // Then load projects
+
+    const currentProject = localStorage.getItem('currentProject');
+    if (currentProject) {
+        loadTasksForProject(currentProject, mainContent);
+    }
 });
 
 function setupNavbar() {
@@ -80,8 +85,10 @@ function setupSidebar(mainContent, taskDomManager) {
                 sublist.appendChild(subListItem);
                 listItem.appendChild(sublist);
                 if(subItem!=='Add Project'){
+                   
                     subListItem.classList.add('projectName');
                     subListItem.addEventListener('click', ()=>{
+                      
                         loadTasksForProject(subItem, mainContent);
                     })
                 }
@@ -100,19 +107,19 @@ function setupSidebar(mainContent, taskDomManager) {
                 loadContent(item, mainContent, taskDomManager);
             });
            
-        sidebarList.appendChild(listItem);
-            
+        sidebarList.appendChild(listItem);   
         }
-        
     });
+
     sidebar.appendChild(sidebarList);
   
     return sidebar;
+
 }
 
 function loadContent(contentName, mainContent, taskDomManager) {
    
-    console.log(contentName);
+  
 
     switch(contentName.toLowerCase()) {
         case 'home':
@@ -124,7 +131,6 @@ function loadContent(contentName, mainContent, taskDomManager) {
         case 'this week':
             loadThisWeekContent(mainContent);
             break;  
-            
         case 'stickywall':
             loadStickyWallContent(mainContent);
             break;    
@@ -178,7 +184,7 @@ function loadTodayContent(mainContent) {
     mainContent.appendChild(todayTaskListContainer);
 
     const todayTasks = taskManager.getTasksForToday();
-    console.log(todayTasks);
+    
     if (todayTasks.length === 0) {
         mainContent.innerHTML = "<p>No tasks due today.</p>";
     } else {
@@ -191,7 +197,7 @@ function loadTodayContent(mainContent) {
 }
 
 function loadThisWeekContent(mainContent) {
-    console.log("Imcalled")
+    
     mainContent.innerHTML="";
 
     const thisWeekContainer=document.createElement('div');
@@ -214,22 +220,27 @@ function loadThisWeekContent(mainContent) {
 }
 
 export function loadTasksForProject(projectName, mainContent) {
+    
     const tasks = taskManager.getTasksByProject(projectName);
-    console.log(`Loading tasks for project: ${projectName}`, tasks);
-
+    // Clear previous content
+    console.log("Tasks for project", projectName, ":", tasks); // Debug
     mainContent.innerHTML = ''; 
-    const projectTasksContainer = document.createElement('div');
-    projectTasksContainer.id = `tasks-for-${projectName.toLowerCase()}`;
-    mainContent.appendChild(projectTasksContainer);
 
+    // Create a new task list container
+    const taskListContainer = document.createElement('div');
+    taskListContainer.id = 'taskListContainer';
+    mainContent.appendChild(taskListContainer);
+
+    // Initialize TaskDomManager with the new container
+    taskDomManager = new TaskDomManager(taskManager, taskListContainer, createModal);
+
+    // Check if tasks are found
     if (tasks.length === 0) {
+      
         mainContent.innerHTML = `<p>No tasks for ${projectName}.</p>`;
     } else {
-        tasks.forEach(task => {
-            const projectDom=new TaskDomManager(taskManager, projectTasksContainer, createModal);
-            projectDom.addTaskToDOM(task);
-        });
-
+        // Refresh task list to display tasks for selected project
+        taskDomManager.refreshFilteredTaskList(tasks);
     }
 }
 
@@ -332,7 +343,8 @@ function createModal(taskDomManager,isEdit = false, task = {}) {
         const dueDate = dueDateInput.value;
         const priority = priorityInput.value;
         const project = document.getElementById('modalProject').value;
-        console.log(project);
+        
+        console.log("Project selected in form:", project); 
     
         if (isEdit) {
             // Update existing task
@@ -373,10 +385,56 @@ function hideModal(overlay){
 }
 
 function loadStickyWallContent(mainContent){
-    // Clear the existing content
+    // Clear existing content
     mainContent.innerHTML="";
 
     new Stickywall(mainContent, 'stickywall-container');
 }
 
+function loadProjects(mainContent) {
+    let storedProjects = JSON.parse(localStorage.getItem('projects')) || [];
+    const defaultProjects = ['Work', 'Personal'];
 
+    // Filter out default projects from stored projects
+    let customProjects = storedProjects.filter(p => !defaultProjects.includes(p));
+
+    // Remove 'Add Project' if it exists in stored projects
+    customProjects = customProjects.filter(p => p !== 'Add Project');
+
+    // Combine default projects with custom projects, and add 'Add Project' at the end
+    let projects = [...defaultProjects, ...customProjects, 'Add Project'];
+
+    const lists = document.getElementById('lists');
+    lists.innerHTML = ''; // Clear existing content
+ 
+    projects.forEach(projectName => {
+        
+        let projectItem = document.createElement('li');
+        projectItem.classList.add('projectName');
+        projectItem.id = projectName.toLowerCase().replace(' ', '-');
+        projectItem.textContent = projectName;
+        // Append a delete button for custom projects, not for default projects and 'Add Project'
+        if (!defaultProjects.includes(projectName) && projectName !== 'Add Project') {
+           
+            let deleteButton = document.createElement('button');
+            deleteButton.textContent = ' X ';
+            deleteButton.classList.add('delete-project');
+            deleteButton.onclick = () => {
+                projectItem.remove();
+                saveProjects();
+            };
+            projectItem.appendChild(deleteButton);
+
+           
+        }
+        projectItem.addEventListener('click', ()=>{
+            
+            localStorage.setItem('currentProject', projectName);
+            loadTasksForProject(projectName, mainContent);
+        });
+
+        lists.appendChild(projectItem);
+    });
+    setupCreateProject();
+   
+}

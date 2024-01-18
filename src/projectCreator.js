@@ -3,6 +3,7 @@ import { TaskDomManager } from "./taskDomManager";
 import { loadTasksForProject } from "./index";
 
 export function setupCreateProject() {
+    console.log("Imcalled")
     const createProject = document.getElementById('add-project');
     if (!createProject) {
         return;
@@ -21,6 +22,7 @@ export function setupCreateProject() {
         let addButton = document.createElement('button');
         addButton.textContent = 'Add';
         addButton.addEventListener('click', () => {
+            console.log("Im clicked")
             addNewProject(inputField.value, createProject);
             revertCreateProject(createProject, projectContainer);
         });
@@ -76,17 +78,21 @@ function addNewProject(projectName, createProject) {
    
     saveProjects();
 
-
+    loadTasksForProject(projectName, mainContent);
 }
 
-function saveProjects(){
-    let projects=[];
-    document.querySelectorAll('#lists li').forEach(li =>{
-        projects.push(li.textContent);
+export function saveProjects() {
+    let projects = [];
+    document.querySelectorAll('#lists li').forEach(li => {
+        const projectNameSpan = li.querySelector('.projectName');
+        if (projectNameSpan) {
+            projects.push(projectNameSpan.textContent);
+        }
     });
     localStorage.setItem('projects', JSON.stringify(projects));
-
 }
+
+
 function revertCreateProject(createProjectButton, projectContainer) {
     if (projectContainer) {
         projectContainer.remove();

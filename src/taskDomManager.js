@@ -62,11 +62,17 @@ export class TaskDomManager {
         });
        
     }
-
     removeTaskFromDom(taskId) {
         const taskElement = document.getElementById(`task-${taskId}`);
         if (taskElement) {
             this.rootElement.removeChild(taskElement);
         }
+    }
+
+    refreshFilteredTaskList(tasksToDisplay) {
+        this.rootElement.innerHTML = '';
+        tasksToDisplay.forEach(task => {
+            this.addTaskToDOM(task);
+        });
     }
 }

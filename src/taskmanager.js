@@ -2,6 +2,7 @@ import { isThisWeek } from "date-fns";
 export class Task{
   constructor(id,description, priority, detail, dueDate, project, isCompleted=false){
       this.id=id;
+      console.log("Creating task with project:", project);
       this.description=description;
       this.detail=detail;
       this.priority=priority;
@@ -26,8 +27,6 @@ export class TaskList{
    addTask(description, priority, detail, dueDate, project){
      const id=this.tasks.length+1;
      const newTask= new Task(id, description, priority, detail, dueDate, project);
-     console.log(dueDate);
-     let today = new Date().toISOString().slice(0, 10)
      this.tasks.push(newTask);
    }
  
@@ -56,18 +55,20 @@ export class TaskManager{
       const savedTasks = localStorage.getItem('tasks');
       if (savedTasks) {
           const tasksArray = JSON.parse(savedTasks);
-          this.taskList.tasks = tasksArray.map(taskObj => new Task(taskObj.id, taskObj.description, taskObj.priority, taskObj.detail, taskObj.dueDate, taskObj.isCompleted));
+          this.taskList.tasks = tasksArray.map(taskObj => new Task(taskObj.id, taskObj.description, taskObj.priority, taskObj.detail, taskObj.dueDate, taskObj.project, taskObj.isCompleted));
       }
+      console.log("Loaded tasks:", this.taskList.tasks); // Debug
     }
 
     addNewTask(description, priority, detail, dueDate, project){
       this.taskList.addTask(description, priority, detail, dueDate, project);
+      console.log("Adding new task with project:", project);
       this.saveTasks(); // Save after adding a new task
     }
   
     deleteTask(taskID){
       this.taskList.removeTask(taskID);
-      this.saveTasks(); // Save after deleting a task
+      this.saveTasks(); // Save after deleting a taskask
     }
   
     toggleTaskStatus(taskId) {
@@ -77,13 +78,14 @@ export class TaskManager{
   
     updateTask(taskId, newDescription, newPriority, newDetail, newDueDate, project) {
       const task = this.taskList.getTask(taskId);
+      console.log("Updating task with project:", project); 
       if (task) {
           task.description = newDescription;
           task.priority = newPriority;
           task.detail = newDetail;
           task.dueDate = newDueDate;
           task.project = project;
-          console.log(project);
+          
       }
       this.saveTasks(); // Save after updating a task
     }
@@ -116,6 +118,7 @@ export class TaskManager{
   }
 
     saveTasks() {
+      console.log("Saving tasks:", this.taskList.tasks);
       localStorage.setItem('tasks', JSON.stringify(this.taskList.tasks));
     }
   }
