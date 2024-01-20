@@ -25,6 +25,7 @@ export class TaskList{
    }
    
    addTask(description, priority, detail, dueDate, project){
+    console.log(`Adding task: ${description}, Project: ${project}`);
      const id=this.tasks.length+1;
      const newTask= new Task(id, description, priority, detail, dueDate, project);
      this.tasks.push(newTask);
@@ -72,8 +73,11 @@ export class TaskManager{
     }
   
     toggleTaskStatus(taskId) {
-      this.taskList.toggleTaskCompletion(taskId);
-      this.saveTasks();// Save task status
+      const task = this.taskList.getTask(taskId);
+      if (task) {
+          task.toggleCompletion();
+          this.saveTasks(); // Save the updated tasks list
+      }
     }
   
     updateTask(taskId, newDescription, newPriority, newDetail, newDueDate, project) {
@@ -104,7 +108,7 @@ export class TaskManager{
     }
 
     getTasksForToday() {
-      console.log("gettask called")
+     
       return this.taskList.tasks.filter(task => this.isDueToday(task));
     }
 
@@ -114,11 +118,14 @@ export class TaskManager{
     }
 
     getTasksByProject(projectName) {
-      return this.taskList.tasks.filter(task => task.project === projectName);
+      const filteredTasks = this.taskList.tasks.filter(task => task.project === projectName);
+      console.log(`Tasks for project ${projectName}:`, filteredTasks);
+      return filteredTasks;
+     
   }
 
     saveTasks() {
-      console.log("Saving tasks:", this.taskList.tasks);
+      
       localStorage.setItem('tasks', JSON.stringify(this.taskList.tasks));
     }
   }

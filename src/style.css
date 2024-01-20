@@ -88,7 +88,7 @@ body {
     color: #000;
 }
 
-#sidebar ul li.active {
+.active {
     background-color: #4CAF50;
     color: white;
 }
@@ -316,6 +316,9 @@ body {
     z-index: 999; /* Just below the modal */
 }
   
+.completed {
+    text-decoration: line-through;
+}
   
   #buttons{
 
@@ -365,10 +368,17 @@ body {
 }
 
 .delete-project{
-    padding: 5px;
+    padding: 12px;
     border-radius: 60%;
     border: none;
     background: brown;
-    color: white;
-    margin-left: 5em;
+    filter: invert(1);
+    /* margin-left: 5em; */
+    background-image: url('/src/assets/close.png');
+}
+
+.custom-project{
+    display: flex;
+    align-items: center;
+    gap: 3em;
 }

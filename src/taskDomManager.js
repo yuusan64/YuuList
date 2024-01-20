@@ -1,4 +1,4 @@
-import { TaskManager } from "./taskmanager";
+import { TaskManager, TaskList } from "./taskmanager";
 export class TaskDomManager {
     constructor(taskManager, rootElement, showModalFunction) {
         
@@ -15,11 +15,20 @@ export class TaskDomManager {
         taskElement.id = `task-${task.id}`;
         taskElement.className = 'task';
         
+        //checkboc
+        const checkbox = document.createElement('input');
+        checkbox.type='checkbox';
+        checkbox.checked=task.isCompleted;
+        checkbox.addEventListener('change', ()=> this.toggleTaskCompletion(task.id))
+        taskElement.appendChild(checkbox);
         // Description
         const description = document.createElement('span');
         description.textContent = task.description;
+        if (task.isCompleted) {
+            description.classList.add('completed'); 
+        }
         taskElement.appendChild(description);
-
+      
         const buttons=document.createElement('div');
         buttons.id='buttons';
     
@@ -40,8 +49,30 @@ export class TaskDomManager {
         this.rootElement.appendChild(taskElement);
 
     }
+    toggleTaskCompletion(taskId) {
+        
+        this.taskManager.toggleTaskStatus(taskId);
     
-
+        const taskElement = document.getElementById(`task-${taskId}`);
+        const description = taskElement.querySelector('span');
+        const task = this.taskManager.taskList.getTask(taskId);
+    
+        if (task.isCompleted) {
+            description.classList.add('completed');
+        } else {
+            description.classList.remove('completed');
+        }
+        const currentProject = localStorage.getItem('currentProject');
+        console.log(`Current project: ${currentProject}`); 
+        if (currentProject) {
+            // Refresh only tasks of the current project
+            const tasksForCurrentProject = this.taskManager.getTasksByProject(currentProject);
+            console.log(`Tasks for current project:`, tasksForCurrentProject); // Debugging tasks for the current project
+            this.refreshFilteredTaskList(tasksForCurrentProject);
+        } else {
+            this.refreshTaskList();
+    }
+}
     deleteTaskFromDOM(taskId) {
         this.taskManager.deleteTask(taskId);
         this.removeTaskFromDom(taskId);
@@ -70,7 +101,9 @@ export class TaskDomManager {
     }
 
     refreshFilteredTaskList(tasksToDisplay) {
+        console.log("Tasks to display:", tasksToDisplay); // Debugging
         this.rootElement.innerHTML = '';
+
         tasksToDisplay.forEach(task => {
             this.addTaskToDOM(task);
         });

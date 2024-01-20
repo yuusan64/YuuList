@@ -9,7 +9,7 @@ let taskDomManager;
 const taskManager = new TaskManager();
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+   
     const mainContent = document.createElement('div');
     mainContent.id = 'mainContent';
 
@@ -40,7 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentProject = localStorage.getItem('currentProject');
     if (currentProject) {
         loadTasksForProject(currentProject, mainContent);
-    }
+    } 
+        loadHomeContent(mainContent, taskDomManager); // Load home content by default
+    
+
+
 });
 
 function setupNavbar() {
@@ -60,9 +64,9 @@ function setupSidebar(mainContent, taskDomManager) {
 
     const sidebarList = document.createElement('ul');                                              
     const menuItems = ['Home', 'Today', 'This Week', 'Lists', 'StickyWall'];                       
-
+    
     menuItems.forEach(item => {
-        
+       
         
         if (item === 'Lists') {
             const listItem = document.createElement('ul');
@@ -70,7 +74,7 @@ function setupSidebar(mainContent, taskDomManager) {
             const listTitle=document.createElement('div');
             listTitle.id=item.toLowerCase()+"-items";
             listTitle.textContent=item;
-            listItem.appendChild(listTitle);
+           listItem.appendChild(listTitle);
 
             
             const sublist = document.createElement('ul');
@@ -81,30 +85,42 @@ function setupSidebar(mainContent, taskDomManager) {
                 const subListItem = document.createElement('li');
                 subListItem.textContent = subItem;
                 subListItem.id = subItem.toLowerCase().replace(' ', '-');
+                
 
                 sublist.appendChild(subListItem);
                 listItem.appendChild(sublist);
-                if(subItem!=='Add Project'){
+               
                    
-                    subListItem.classList.add('projectName');
+                    
                     subListItem.addEventListener('click', ()=>{
-                      
+                        
+                        if(subItem !== 'Add Project'){
+                            subListItem.classList.add('projectName', 'sidebar-menu-item');
                         loadTasksForProject(subItem, mainContent);
+                    }
                     })
-                }
+                
 
            
                 
             });
             sidebarList.appendChild(listItem);
-
+            
             
         } else {
             const listItem = document.createElement('li');
             listItem.textContent = item;
             listItem.id = item.toLowerCase();
+            listItem.classList.add('sidebar-menu-item');
+        
             listItem.addEventListener('click', () => {
-                loadContent(item, mainContent, taskDomManager);
+               
+                if (item.toLowerCase() === 'home') {
+                
+                    loadHomeContent(mainContent, taskDomManager);
+                } else {
+                    loadContent(item, mainContent, taskDomManager);
+                }
             });
            
         sidebarList.appendChild(listItem);   
@@ -112,10 +128,13 @@ function setupSidebar(mainContent, taskDomManager) {
     });
 
     sidebar.appendChild(sidebarList);
-  
+    
+    attachEventListenersToSidebar();
     return sidebar;
+    
 
 }
+
 
 function loadContent(contentName, mainContent, taskDomManager) {
    
@@ -236,7 +255,7 @@ export function loadTasksForProject(projectName, mainContent) {
 
     // Check if tasks are found
     if (tasks.length === 0) {
-      
+       
         mainContent.innerHTML = `<p>No tasks for ${projectName}.</p>`;
     } else {
         // Refresh task list to display tasks for selected project
@@ -400,7 +419,8 @@ function loadProjects(mainContent) {
 
     // Remove 'Add Project' if it exists in stored projects
     customProjects = customProjects.filter(p => p !== 'Add Project');
-
+    
+    
     // Combine default projects with custom projects, and add 'Add Project' at the end
     let projects = [...defaultProjects, ...customProjects, 'Add Project'];
 
@@ -410,14 +430,13 @@ function loadProjects(mainContent) {
     projects.forEach(projectName => {
         
         let projectItem = document.createElement('li');
-        projectItem.classList.add('projectName');
+        projectItem.classList.add('projectName', 'sidebar-menu-item');
         projectItem.id = projectName.toLowerCase().replace(' ', '-');
         projectItem.textContent = projectName;
         // Append a delete button for custom projects, not for default projects and 'Add Project'
         if (!defaultProjects.includes(projectName) && projectName !== 'Add Project') {
-           
+            projectItem.classList.add('custom-project');
             let deleteButton = document.createElement('button');
-            deleteButton.textContent = ' X ';
             deleteButton.classList.add('delete-project');
             deleteButton.onclick = () => {
                 projectItem.remove();
@@ -431,10 +450,30 @@ function loadProjects(mainContent) {
             
             localStorage.setItem('currentProject', projectName);
             loadTasksForProject(projectName, mainContent);
+          
         });
 
         lists.appendChild(projectItem);
     });
     setupCreateProject();
+    attachEventListenersToSidebar();
    
+}
+
+export function attachEventListenersToSidebar() {
+    document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+        item.addEventListener('click', function() {
+            setActiveMenuItem(this);
+        });
+    });
+}
+
+export function setActiveMenuItem(clickedItem) {
+    // Remove 'active' class from all items
+    document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // Add 'active' class to the clicked item
+    clickedItem.classList.add('active');
 }

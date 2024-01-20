@@ -1,9 +1,9 @@
 import { TaskDomManager } from "./taskDomManager";
 
-import { loadTasksForProject } from "./index";
+import { loadTasksForProject, attachEventListenersToSidebar, setActiveMenuItem } from "./index";
 
 export function setupCreateProject() {
-    console.log("Imcalled")
+  
     const createProject = document.getElementById('add-project');
     if (!createProject) {
         return;
@@ -22,7 +22,7 @@ export function setupCreateProject() {
         let addButton = document.createElement('button');
         addButton.textContent = 'Add';
         addButton.addEventListener('click', () => {
-            console.log("Im clicked")
+        
             addNewProject(inputField.value, createProject);
             revertCreateProject(createProject, projectContainer);
         });
@@ -39,6 +39,7 @@ export function setupCreateProject() {
 }
 
 function addNewProject(projectName, createProject) {
+   
     if (projectName.trim() === '') {
         alert('Project name cannot be empty');
         return;
@@ -48,23 +49,24 @@ function addNewProject(projectName, createProject) {
     proectNameSpan.textContent=projectName;
     proectNameSpan.classList.add('projectName');
     newProject.appendChild(proectNameSpan);
-   console.log(proectNameSpan);
+  
    
 
     
     
     
     newProject.id = projectName.toLowerCase().replace(' ', '-');
+    newProject.classList.add('sidebar-menu-item', 'custom-project');
     createProject.parentNode.insertBefore(newProject, createProject);
-    newProject.addEventListener('click', ()=>{
-        loadTasksForProject(projectName, mainContent)
-    })
+    newProject.addEventListener('click', () => {
+        localStorage.setItem('currentProject', projectName);
+        loadTasksForProject(projectName, mainContent);
+    });
     saveProjects();
     // lists.appendChild(newProject);
 
 
     let deleteButton=document.createElement('button');
-    deleteButton.textContent=' X ';
     deleteButton.classList.add("delete-project");
     deleteButton.onclick=()=>{
         newProject.remove();
@@ -73,12 +75,11 @@ function addNewProject(projectName, createProject) {
     newProject.appendChild(deleteButton);
    
     let lists = document.getElementById('lists');
-    console.log(newProject);
-    console.log(createProject);
-   
+    
     saveProjects();
 
     loadTasksForProject(projectName, mainContent);
+    attachEventListenersToSidebar();
 }
 
 export function saveProjects() {
