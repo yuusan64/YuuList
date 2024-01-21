@@ -10,12 +10,24 @@ export class TaskDomManager {
 
     //create DOM elements for task and append to root
     addTaskToDOM(task) { 
-
+        
         const taskElement = document.createElement('div');
         taskElement.id = `task-${task.id}`;
         taskElement.className = 'task';
-        
-        //checkboc
+
+        const priorityClasses = {
+            'High': 'high-priority',
+            'Medium': 'medium-priority',
+            'Low': 'low-priority'
+        };
+
+        const priorityClass = priorityClasses[task.priority];
+
+        if (priorityClass) {
+              taskElement.classList.add(priorityClass);
+        }
+
+        //checkbox
         const checkbox = document.createElement('input');
         checkbox.type='checkbox';
         checkbox.checked=task.isCompleted;
@@ -33,15 +45,15 @@ export class TaskDomManager {
         buttons.id='buttons';
     
         // Edit Button
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
+        const editButton = document.createElement('div');
+        editButton.classList.add('editButton');
         editButton.onclick = () => this.showModal(this,true, task);
         buttons.appendChild(editButton);
         
     
         // Delete Button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
+        const deleteButton = document.createElement('div');
+        deleteButton.classList.add('deleteButton');
         deleteButton.onclick = () => this.deleteTaskFromDOM(task.id);
         buttons.appendChild(deleteButton);
         taskElement.appendChild(buttons);
@@ -50,7 +62,7 @@ export class TaskDomManager {
 
     }
     toggleTaskCompletion(taskId) {
-        
+        console.log(taskId);
         this.taskManager.toggleTaskStatus(taskId);
     
         const taskElement = document.getElementById(`task-${taskId}`);
@@ -58,9 +70,9 @@ export class TaskDomManager {
         const task = this.taskManager.taskList.getTask(taskId);
     
         if (task.isCompleted) {
-            description.classList.add('completed');
+        description.classList.add('completed');
         } else {
-            description.classList.remove('completed');
+        description.classList.remove('completed');
         }
         const currentProject = localStorage.getItem('currentProject');
         console.log(`Current project: ${currentProject}`); 

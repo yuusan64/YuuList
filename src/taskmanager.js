@@ -121,6 +121,7 @@ export class TaskManager{
       const filteredTasks = this.taskList.tasks.filter(task => task.project === projectName);
       console.log(`Tasks for project ${projectName}:`, filteredTasks);
       return filteredTasks;
+      
      
   }
 

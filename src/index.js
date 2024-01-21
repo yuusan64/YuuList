@@ -19,8 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     //load tasks from localStorage
 
-
-    const navbar = setupNavbar();
     const sidebar = setupSidebar(mainContent,taskDomManager);
   
 
@@ -29,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     content.appendChild(sidebar);
     content.appendChild(mainContent);
 
-    document.body.appendChild(navbar);
     document.body.appendChild(content);
 
     loadHomeContent(mainContent,taskDomManager); // Load home content by default
@@ -37,30 +34,42 @@ document.addEventListener('DOMContentLoaded', () => {
     taskManager.loadTasks();  // Load tasks from localStorage
     loadProjects(mainContent); // Then load projects
 
-    const currentProject = localStorage.getItem('currentProject');
+   const currentProject = localStorage.getItem('currentProject');
     if (currentProject) {
         loadTasksForProject(currentProject, mainContent);
     } 
+    else{
         loadHomeContent(mainContent, taskDomManager); // Load home content by default
-    
+    }
 
 
 });
 
-function setupNavbar() {
-    const navbar = document.createElement('div');
-    navbar.id = 'navbar';
-    
-    const title = document.createElement('h1');
-    title.textContent = 'Todo List';
-    navbar.appendChild(title);
-
-    return navbar;
-}
 
 function setupSidebar(mainContent, taskDomManager) {
     const sidebar = document.createElement('div');
     sidebar.id = 'sidebar';
+
+    const title = document.createElement('h1');
+    
+   
+
+    const yuuSpan = document.createElement('span');
+    yuuSpan.textContent = 'Yuu';
+    yuuSpan.className = 'yuu-title';
+    title.appendChild(yuuSpan);
+    
+    const listSpan = document.createElement('span');
+    listSpan.textContent = 'List';
+    listSpan.className = 'list-title';
+    title.appendChild(listSpan);
+
+    sidebar.appendChild(title);
+    const todoIcon=document.createElement('div');
+    todoIcon.classList.add('todo-icon');
+
+    title.appendChild(todoIcon);
+    
 
     const sidebarList = document.createElement('ul');                                              
     const menuItems = ['Home', 'Today', 'This Week', 'Lists', 'StickyWall'];                       
@@ -116,7 +125,7 @@ function setupSidebar(mainContent, taskDomManager) {
             listItem.addEventListener('click', () => {
                
                 if (item.toLowerCase() === 'home') {
-                
+                    localStorage.removeItem('currentProject');
                     loadHomeContent(mainContent, taskDomManager);
                 } else {
                     loadContent(item, mainContent, taskDomManager);
@@ -254,7 +263,7 @@ export function loadTasksForProject(projectName, mainContent) {
     taskDomManager = new TaskDomManager(taskManager, taskListContainer, createModal);
 
     // Check if tasks are found
-    if (tasks.length === 0) {
+    if (tasks.length === 0 && projectName!=='Add Project') {
        
         mainContent.innerHTML = `<p>No tasks for ${projectName}.</p>`;
     } else {
@@ -363,6 +372,16 @@ function createModal(taskDomManager,isEdit = false, task = {}) {
         const priority = priorityInput.value;
         const project = document.getElementById('modalProject').value;
         
+         // Validation
+         if (!description) {
+            alert("Please enter a task description.");
+            return;
+        }
+        if (!dueDate) {
+            alert("Please select a due date.");
+            return;
+        }
+
         console.log("Project selected in form:", project); 
     
         if (isEdit) {
@@ -430,7 +449,11 @@ function loadProjects(mainContent) {
     projects.forEach(projectName => {
         
         let projectItem = document.createElement('li');
-        projectItem.classList.add('projectName', 'sidebar-menu-item');
+        if(projectName!=='Add Project'){
+            projectItem.classList.add('projectName', 'sidebar-menu-item');
+        }
+            
+        
         projectItem.id = projectName.toLowerCase().replace(' ', '-');
         projectItem.textContent = projectName;
         // Append a delete button for custom projects, not for default projects and 'Add Project'
@@ -442,16 +465,16 @@ function loadProjects(mainContent) {
                 projectItem.remove();
                 saveProjects();
             };
-            projectItem.appendChild(deleteButton);
-
-           
+projectItem.appendChild(deleteButton);
+       
         }
-        projectItem.addEventListener('click', ()=>{
+            projectItem.addEventListener('click', ()=>{
             
-            localStorage.setItem('currentProject', projectName);
-            loadTasksForProject(projectName, mainContent);
-          
-        });
+                localStorage.setItem('currentProject', projectName);
+                loadTasksForProject(projectName, mainContent);
+              
+            });
+            
 
         lists.appendChild(projectItem);
     });
@@ -470,6 +493,7 @@ export function attachEventListenersToSidebar() {
 
 export function setActiveMenuItem(clickedItem) {
     // Remove 'active' class from all items
+  
     document.querySelectorAll('.sidebar-menu-item').forEach(item => {
         item.classList.remove('active');
     });

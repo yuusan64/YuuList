@@ -62,6 +62,9 @@ function addNewProject(projectName, createProject) {
         localStorage.setItem('currentProject', projectName);
         loadTasksForProject(projectName, mainContent);
     });
+
+
+    
     saveProjects();
     // lists.appendChild(newProject);
 

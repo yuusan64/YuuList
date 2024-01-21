@@ -1,13 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Sketch:wght@400;700&family=Carattere&family=Caveat:wght@500;700&family=Dancing+Script&family=Great+Vibes&family=Luckiest+Guy&family=Oswald:wght@300&family=Roboto&family=Roboto+Mono:wght@500&family=Shadows+Into+Light&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Sketch:wght@400;700&family=Carattere&family=Caveat:wght@500;700&family=Dancing+Script&family=Great+Vibes&family=Josefin+Sans:wght@600&family=Luckiest+Guy&family=Oswald:wght@300&family=Quicksand:wght@600;700&family=Roboto&family=Roboto+Mono:wght@500&family=Shadows+Into+Light&display=swap');
 /* Basic reset */
+
+
 body, h1, button, input, textarea, select {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Quicksand', sans-serif;
 }
-
+h1{
+    position: relative;
+    display: flex;
+    align-items: end;
+    
+    margin-top: 0.3em;
+    margin-bottom: 1em;
+}
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    
+    background-color: #15181F;
 }
 
 #addTaskButton {
@@ -26,22 +38,35 @@ body {
 #addTaskButton:hover {
     background-color: #45a049; /* Slightly darker green on hover */
 }
-
+.todo-icon {
+    position: absolute;
+    left: 4.7em;
+    top: -0.4em;
+    background-image: url('/src/assets/icons8-cat2.png');
+    background-size: 2.1em 2em;
+    height: 2em;
+    width: 4em;
+    background-repeat: no-repeat;
+}
+/* 
 #navbar {
     width: 100%;
     background-color: #333;
     color: white;
     padding: 10px 20px;
     text-align: left;
-}
+} */
 
 #content {
     display: flex;
 }
 
+/*sidebar*/
+
 #sidebar {
-    width: 200px;
-    background-color: #f0f0f0;
+    
+    width: 14em;
+    background-color: #1A1E27;
     padding: 20px;
     height: 100vh;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -52,10 +77,9 @@ body {
     padding: 0;
 }
 
-
 #sidebar ul ul{
     margin-left: 1.5em;
-    padding-top: 10px 
+    padding: 10px 0px 10px 0px;
 
 }
 
@@ -63,30 +87,21 @@ body {
     padding-left: 0;
 }
 
-#sidebar li:hover {
-    background-color: #e0e0e0;
-} 
-/* Hover style for all sidebar items */
-#sidebar ul li:hover {
-    background-color: #e0e0e0;
-}
 
 /* Specific hover style for nested items, if needed */
-#sidebar ul ul li:hover {
-    background-color: #d0d0d0; /* Slightly different color for testing */
+.sidebar-menu-item:hover {
+    background-color:  #242831;
 }
 
 #sidebar ul li {
+    font-size: 1.2em;
+    margin: 3px;
     cursor: pointer;
     padding: 10px 20px;
-    color: #333;
+    color: white;
     transition: background-color 0.3s, color 0.3s;
 }
 
-#sidebar ul li:hover {
-    background-color: #f0f0f0;
-    color: #000;
-}
 
 .active {
     background-color: #4CAF50;
@@ -99,11 +114,11 @@ body {
 
 #mainContent {
     flex-grow: 1;
-    padding: 20px;
+    padding: 4em 4em;
 }
 
 #taskInputContainer {
-    margin-bottom: 20px;
+    margin-bottom: 2em;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -120,6 +135,7 @@ body {
 }
 
 #taskInputContainer button {
+    font-family:'Quicksand', sans-serif ;
     padding: 10px 15px;
     background-color: #5cb85c;
     color: white;
@@ -133,18 +149,38 @@ body {
 }
 
 .task {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    color: white;
+    background-color: #1A1E27;
+    border: 1px solid #1e1e1e;
+    border-left: 6px solid transparent; /* Default border */
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+.high-priority {
+    border-left-color: #6d2121;
 }
 
+.medium-priority {
+    border-left-color: #b19632;
+}
+
+.low-priority {
+    border-left-color: #4CAF50;
+}
 .task input[type="checkbox"] {
-    margin-right: 10px;
+    margin-right: 15px; /* Space between checkbox and description */
+    accent-color: #5cb85c;
+}
+
+.task span {
+    flex-grow: 1; /* Make description take up available space */
+    margin-right: 10px; /* Space before buttons */
 }
 
 .task span.priority, 
@@ -157,39 +193,36 @@ body {
     color: #999;
 }
 
-.task button {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
 
-.task button:hover {
+.task #button:hover {
     background-color: #c9302c;
 }
 
 /* Modal styles */
 .task-modal {
+   
+    margin: 2em;
     position: fixed;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 30px;
+    background-color: #2f35458c;
+    padding: 3em;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    z-index: 1000; /* Ensure it's above other content */
+    z-index: 1000;
 }
 
 .task-modal input, 
 .task-modal textarea, 
 .task-modal select {
-    width: 100%;
+    width: 95%;
+    font-size: 1em;
+    /* height: 2em; */
+    background-color: #d3d3d3ce;
     padding-right: 0px;
-    padding: 10px 0px 10px 10px;
-    margin-bottom: 10px;
+    padding: 15px 6px;
+    margin-bottom: 1.2em;
     /* margin-right: 0px; */
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -226,21 +259,20 @@ body {
 
 /* Modal for adding notes */
 .sticky-modal {
-    display: none;
+    border-radius: 5px;
     position: fixed;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #ccc;
+    background-color: #2f35458c;
+    padding: 30px;
     z-index: 1000;
 }
 
 .sticky-modal input, .sticky-modal textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+    width: 90%;
+    padding: 15px;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
@@ -323,20 +355,23 @@ body {
   #buttons{
 
     display: flex;
+    gap: 1em;
     justify-content: space-between;
   }
 
   #project-container {
     padding: 10px;
     border: 1px solid #ddd;
-    background-color: #f9f9f9;
+    /* background-color: #f9f9f9; */
     margin-bottom: 10px;
+    border: none;
 }
 
 #project-container input[type="text"] {
     width: 70%;
     padding: 8px 10px;
     margin-right: 10px;
+    margin-bottom: 4px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
@@ -352,6 +387,7 @@ body {
 #project-container button:nth-child(2) {
     background-color: #4CAF50;
     color: white;
+    margin-right: 1em;
 }
 
 #project-container button:nth-child(2):hover {
@@ -359,7 +395,7 @@ body {
 }
 
 #project-container button:nth-child(3) {
-    background-color: #f44336;
+    background-color: #242831;
     color: white;
 }
 
@@ -367,18 +403,101 @@ body {
     background-color: #d32f2f;
 }
 
-.delete-project{
-    padding: 12px;
-    border-radius: 60%;
+.delete-project {
+    background-size: 2em 2em;
+    background-position: center;
+    width: 2.5vw;
+    height: 2.5vh;
+    background-color: transparent;
+    background-repeat: no-repeat;
     border: none;
-    background: brown;
+    color: whitesmoke;
     filter: invert(1);
     /* margin-left: 5em; */
     background-image: url('/src/assets/close.png');
+    /* transition: transform 0.3s ease; */
+    transition: background-size 0.3s ease;
 }
-
 .custom-project{
     display: flex;
     align-items: center;
-    gap: 3em;
+    justify-content: space-between;
+}
+#navbar {
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    text-align: left;
+}
+
+#navbar h1 {
+    margin: 0;
+   
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.yuu-title {
+    color: #5cb85c; /* Gold color for 'Check' */
+    font-size: 1.5em;
+}
+
+.list-title {
+    color: #f5f5f5; /* Light color for 'Mate' */
+    font-size: 1.5em;
+}
+
+#navbar h1:hover {
+    border-bottom: 2px solid #d4af37;
+}
+
+#add-project{
+    color: rgb(92, 184, 92) !important;
+}
+.editButton, .deleteButton{
+    background-position: center;
+    background-color: transparent;
+    cursor: pointer; 
+    transition: background-size 0.3s ease;
+}
+.editButton{
+    background-image: url('/src/assets/icons8-edit.png');
+    background-repeat: no-repeat;
+    height: 1.5em;
+    width: 1.5em;
+    background-size: 1.2em 1.2em;
+}
+
+.deleteButton{
+    background-image: url('/src/assets/icons8-delete.png');
+    background-repeat: no-repeat;
+    height: 1.5em;
+    width: 1.5em;
+    background-size: 1.2em 1.2em;
+}
+
+
+.editButton:hover, .deleteButton:hover{
+
+    background-size: 1.5em 1.5em;
+    /* Or a slight change in background color */
+   
+}
+
+.task:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
+    transform: scale(1.01); /* Slightly scale up the task */
+}
+
+.delete-project:hover{
+    background-size: 2.3em 2.3em;
+    
+}
+
+input:focus, textarea:focus {
+    border: none;
+    outline: none; /* Removes the default focus outline */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow for focus indication */
+    background-color: whitesmoke;
 }
