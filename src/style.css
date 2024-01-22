@@ -553,3 +553,10 @@ footer {
     align-items: center;
     gap: 5px;
 }
+.note p{
+   
+    color: #d4d4d4 !important;
+}
+#mainContent p{
+    color: #606060;
+}
