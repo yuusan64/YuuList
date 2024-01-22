@@ -57,7 +57,7 @@ export class Stickywall{
    addNote(){
 
       if (!this.modal || !this.modal.titleInput || !this.modal.textInput) {
-         console.error("Modal is not initialized properly.");
+
          return;
      }
      

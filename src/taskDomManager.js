@@ -62,7 +62,7 @@ export class TaskDomManager {
 
     }
     toggleTaskCompletion(taskId) {
-        console.log(taskId);
+
         this.taskManager.toggleTaskStatus(taskId);
     
         const taskElement = document.getElementById(`task-${taskId}`);
@@ -75,11 +75,11 @@ export class TaskDomManager {
         description.classList.remove('completed');
         }
         const currentProject = localStorage.getItem('currentProject');
-        console.log(`Current project: ${currentProject}`); 
+
         if (currentProject) {
             // Refresh only tasks of the current project
             const tasksForCurrentProject = this.taskManager.getTasksByProject(currentProject);
-            console.log(`Tasks for current project:`, tasksForCurrentProject); // Debugging tasks for the current project
+
             this.refreshFilteredTaskList(tasksForCurrentProject);
         } else {
             this.refreshTaskList();
@@ -113,7 +113,7 @@ export class TaskDomManager {
     }
 
     refreshFilteredTaskList(tasksToDisplay) {
-        console.log("Tasks to display:", tasksToDisplay); // Debugging
+  
         this.rootElement.innerHTML = '';
 
         tasksToDisplay.forEach(task => {

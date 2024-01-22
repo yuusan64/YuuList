@@ -12,6 +12,41 @@ document.addEventListener('DOMContentLoaded', () => {
    
     const mainContent = document.createElement('div');
     mainContent.id = 'mainContent';
+    
+    const footer = document.createElement('footer');
+    footer.className = 'footer';
+
+    const iconImg = document.createElement('div');
+    iconImg.classList.add('iconImg');
+    iconImg.alt = 'GitHub Icon';
+    
+
+    const text = document.createTextNode(' Copyright @yuusan64 ')
+    const bar=document.createTextNode("|");
+    const iconSrc=document.createElement('div');
+    iconSrc.textContent=' Icons by '
+    const icons=document.createElement('a');
+    icons.textContent="Icons8"
+    icons.href="https://icons8.com/";
+    icons.style.color="#5cb85c";
+
+    let left=document.createElement('div');
+    left.appendChild(iconImg);
+    left.appendChild(text);
+    footer.appendChild(left);
+
+    footer.appendChild(bar);
+
+    let right=document.createElement('div');
+    right.appendChild(iconSrc);
+    right.appendChild(icons);
+    right.id="right";
+    left.id="left";
+
+    footer.appendChild(right);
+
+    document.body.appendChild(footer);
+    
 
     const taskListContainer = document.createElement('div');
     taskListContainer.id = 'taskListContainer';
@@ -53,7 +88,7 @@ function setupSidebar(mainContent, taskDomManager) {
     const title = document.createElement('h1');
     
    
-
+    
     const yuuSpan = document.createElement('span');
     yuuSpan.textContent = 'Yuu';
     yuuSpan.className = 'yuu-title';
@@ -251,7 +286,6 @@ export function loadTasksForProject(projectName, mainContent) {
     
     const tasks = taskManager.getTasksByProject(projectName);
     // Clear previous content
-    console.log("Tasks for project", projectName, ":", tasks); // Debug
     mainContent.innerHTML = ''; 
 
     // Create a new task list container
@@ -381,8 +415,6 @@ function createModal(taskDomManager,isEdit = false, task = {}) {
             alert("Please select a due date.");
             return;
         }
-
-        console.log("Project selected in form:", project); 
     
         if (isEdit) {
             // Update existing task

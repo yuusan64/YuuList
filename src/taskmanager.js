@@ -2,7 +2,6 @@ import { isThisWeek } from "date-fns";
 export class Task{
   constructor(id,description, priority, detail, dueDate, project, isCompleted=false){
       this.id=id;
-      console.log("Creating task with project:", project);
       this.description=description;
       this.detail=detail;
       this.priority=priority;
@@ -25,7 +24,7 @@ export class TaskList{
    }
    
    addTask(description, priority, detail, dueDate, project){
-    console.log(`Adding task: ${description}, Project: ${project}`);
+
      const id=this.tasks.length+1;
      const newTask= new Task(id, description, priority, detail, dueDate, project);
      this.tasks.push(newTask);
@@ -58,12 +57,11 @@ export class TaskManager{
           const tasksArray = JSON.parse(savedTasks);
           this.taskList.tasks = tasksArray.map(taskObj => new Task(taskObj.id, taskObj.description, taskObj.priority, taskObj.detail, taskObj.dueDate, taskObj.project, taskObj.isCompleted));
       }
-      console.log("Loaded tasks:", this.taskList.tasks); // Debug
+
     }
 
     addNewTask(description, priority, detail, dueDate, project){
       this.taskList.addTask(description, priority, detail, dueDate, project);
-      console.log("Adding new task with project:", project);
       this.saveTasks(); // Save after adding a new task
     }
   
@@ -82,7 +80,6 @@ export class TaskManager{
   
     updateTask(taskId, newDescription, newPriority, newDetail, newDueDate, project) {
       const task = this.taskList.getTask(taskId);
-      console.log("Updating task with project:", project); 
       if (task) {
           task.description = newDescription;
           task.priority = newPriority;
@@ -100,9 +97,6 @@ export class TaskManager{
       const dueDate = new Date(task.dueDate);
       dueDate.setHours(0,0,0,0);
 
-      console.log(`Checking task: ${task.description}, Due Date: ${dueDate}, Today: ${today}`);
-        console.log(`Due Date Time: ${dueDate.getTime()}, Today Time: ${today.getTime()}`);
-
      
       return dueDate.getTime() === today.getTime();
     }
@@ -119,9 +113,8 @@ export class TaskManager{
 
     getTasksByProject(projectName) {
       const filteredTasks = this.taskList.tasks.filter(task => task.project === projectName);
-      console.log(`Tasks for project ${projectName}:`, filteredTasks);
       return filteredTasks;
-      
+
      
   }
 
