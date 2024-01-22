@@ -60,7 +60,7 @@ export class Stickywall{
          console.error("Modal is not initialized properly.");
          return;
      }
- 
+     
      const titleValue = this.modal.titleInput.value;
      const textValue = this.modal.textInput.value;
  
@@ -114,12 +114,11 @@ export class Stickywall{
       });
       
       const titleElement=document.createElement('h3');
-      titleElement.textContent=title;
+      titleElement.textContent=title.toUpperCase();
       const textElement = document.createElement('p');
       textElement.textContent=text;
 
       const removeButton=document.createElement('button');
-      removeButton.textContent='X';
       removeButton.classList.add('remove-note');
       removeButton.addEventListener('click', ()=>{
          note.remove();

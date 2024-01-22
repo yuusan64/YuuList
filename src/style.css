@@ -43,7 +43,7 @@ body {
     left: 4.7em;
     top: -0.4em;
     background-image: url('/src/assets/icons8-cat2.png');
-    background-size: 2.1em 2em;
+    background-size: 2.2em 2em;
     height: 2em;
     width: 4em;
     background-repeat: no-repeat;
@@ -248,17 +248,22 @@ body {
     text-align: center;
     height: 14em;
     width: 10em;
-    background-color: #ffeb3b;
+    background-color: #1A1E27;
     padding: 10px;
     margin: 10px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
-    /* max-width: 239px; */
     word-wrap: break-word;
+    border-radius: 5px;
+}
+
+.note p, h3{
+    color: whitesmoke;
 }
 
 /* Modal for adding notes */
 .sticky-modal {
+    display: none;
     border-radius: 5px;
     position: fixed;
     left: 50%;
@@ -302,6 +307,7 @@ body {
   #stickywall-container{
     display: flex;
     gap: 1em;
+    flex-wrap: wrap;
   }
 
 /* Add note button */
@@ -322,21 +328,26 @@ body {
 /* Remove note button */
 .remove-note {
     position: absolute;
+    background-size: 15px 16px;
     top: 5px;
     right: 5px;
-    background-color: red;
-    color: white;
-    border: none;
+    background-color: #1A1E27;
     cursor: pointer;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    line-height: 20px; /* Aligns text vertically */
+    background-position: center;
+    border: none;
+    width: 22px;
+    height: 25px;
+    line-height: 20px;
     text-align: center;
-    font-size: 12px;
+    background-image: url('/src/assets/icons8-remove.png');
+    background-repeat: no-repeat;
 }
 
- 
+.remove-note:hover{
+
+    background-size: 18px 19px;
+}
+
 /* Background overlay */
 #task-modal-backdrop {
     position: fixed;
@@ -455,6 +466,11 @@ body {
 #add-project{
     color: rgb(92, 184, 92) !important;
 }
+
+#add-project:hover{
+    text-shadow: -1px 0px 3px #98d885;
+}
+
 .editButton, .deleteButton{
     background-position: center;
     background-color: transparent;
