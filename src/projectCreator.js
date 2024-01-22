@@ -64,9 +64,8 @@ function addNewProject(projectName, createProject) {
     });
 
 
-    
+
     saveProjects();
-    // lists.appendChild(newProject);
 
 
     let deleteButton=document.createElement('button');
